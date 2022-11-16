@@ -2,86 +2,36 @@ clc;
 clear all;
 close all;
 
-package load communications 
+x=-5:0.5:5;
+y=normpdf(x,0,1);
+subplot(1,5,1);
+plot(x,y);
+title('mean=0 , standard deviation=1') 
 
-n=input("Enter the no of source elements: ");
-q=input("Enter the channel matrix P(Y/X): "); %matrix P(Y|X)
-disp(q);
-disp('');
+x=-5:0.5:5;
+y=normpdf(x,0,0.5);
+subplot(1,5,2);
+plot(x,y);
+title('mean=0 , standard deviation=0.5') 
 
-N=1:n;
-p=input("Enter the source probability: "); %probabilities for X
+x=-5:0.5:5;
+y=normpdf(x,1,1);
+subplot(1,5,3);
+plot(x,y);
+title('mean=1 , standard deviation=1')  
 
-px=diag(p,n,n); %matrix P(X)
-disp("P(X) : ");
-disp(px);
-disp('');
+y=normrnd(0,1,1,200);
+Gy=periodogram(y);
+Ry=abs(ifft(Gy,256));
+Ry=[Ry(130:256)' Ry(1:129)']
+t=-127:1:128;
+subplot(1,5,4)
+plot(Gy)
+xlabel('frequencysamples');
+title('PSD')
+subplot(1,5,5)
+plot(t,Ry)
+xlabel('time shift')
+title('autocorrelation') 
 
-pxy=px*q; % P(X,Y)=P(X)*P(Y|X)
-disp("P(X,Y) : ");
-disp(pxy); 
-disp('');
-
-py=p*q;  % P(Y))
-disp('P(Y):');
-disp(py);
-disp('');
-
-%Entropy of source h(x)
-Hx=0;
-for i=1:n
-  Hx=Hx+(-(p(i)*log2(p(i))));
-end
-disp('H(x): ');
-disp(Hx);
-disp('');
-
-% Entropy of destination H
-Hy=0;
-for i=1:n
-  Hy=Hy+(-(py(i)*log2(py(i))));
-end
-disp('H(y): ');
-disp(Hy);
-disp('');
-
-% Mutual Entropy H(x,y)
-hxy=0
-for i=1:n
-  for j=1:n
-    hxy=hxy+(-pxy(i,j)*log2(pxy(i,j)));
-  end
-end
-disp('H(x,y): ');
-disp(hxy);
-disp('');
-
-% Conditional Entropy H(x/y)
-h1= hxy - Hx;
-disp('H(x/y): ');
-disp(h1);
-disp('');
-
-% Conditional Entropy H(y/x)
-h2= hxy - Hy;
-disp('H(y/x): ');
-disp(h2);
-disp('');
-
-% Mutual Information I(x,y)
-Ixy= Hx - h2;
-disp('I(x,y): ');
-disp(Ixy);
-disp('');
-
-if h2==0
-  disp("This channel is a lossless channel ");
-  end
-if Ixy==0
-  disp ("This channel is a useless channel ");
-  end
-if Hx==Hy
-  if h1==0
-    disp("This channel is a noiseless channel ");
-    end
-endif
+%for error in normpdf write pkg load statistics in command window
